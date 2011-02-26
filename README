@@ -1,7 +1,7 @@
-nowm
-	using X11 without a window manager
+no-wm
+	Use X11 without a window manager
 
-component
+components
 	included
 		x-alt-tab
 		x-move-resize
@@ -22,8 +22,10 @@ component
 procedure
 	set up your ${HOME}/.xinitrc to be something like
 		#!/bin/bash
+		while ! xprop -root | grep -q Free; do sleep 1; done
 		xrdb -merge ${HOME}/etc/Xresources
 		xsetroot -solid black
+		xset b off
 		exec xterm &
 		exec speckeysd ${HOME}/etc/speckeysd.conf &
 		exec x-session
@@ -36,7 +38,7 @@ procedure
 		Control-Alt-s	surf "$( echo www.duckduckgo.com | dmenu )"
 		Control-Alt-t	urxvt || rxvt || xterm
 		Alt-F1	x-move-resize
-		F10	xdotool getwindowfocus windowsize  100% 100% windowmove 0 0
+		F10	xdotool selectwindow windowsize 100% 100% windowmove 0 0
 	then ${HOME}/etc/Xresources with the preferred window geometries
 		R_x11*geometry: 1024x600+0+0
 		XTerm*geometry: 1024x600+0+0
