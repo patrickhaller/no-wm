@@ -7,7 +7,7 @@ components
 		x-move-resize
 		x-session
 	distributed with X11 
-		xsel xprop xrdb xset xsetroot
+		xsel xprop xrdb xset xsetroot xwininfo
 	key-daemons
 		xbindkeys http://www.nongnu.org/xbindkeys/xbindkeys.html
 		speckeysd http://www.jessies.org/~enh/software/x11/
