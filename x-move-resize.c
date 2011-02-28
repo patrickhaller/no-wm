@@ -51,38 +51,38 @@ int die(Display *dpy, int return_value) {
 
 int main()
 {
-    Display * dpy;
-    Window root;
-    XWindowAttributes attr;
-    XButtonEvent start;
-    XEvent ev;
+	Display * dpy;
+	Window root;
+	XWindowAttributes attr;
+	XButtonEvent start;
+	XEvent ev;
 	Cursor cursor;
 	int cursor_shape = XC_X_cursor;
 	start.button = 0; start.x_root = 0; start.y_root = 0;
 
-    if(!(dpy = XOpenDisplay(0x0))) return 1;
+	if(!(dpy = XOpenDisplay(0x0))) return 1;
 
-    root = DefaultRootWindow(dpy);
+	root = DefaultRootWindow(dpy);
 
-    XGrabButton(dpy, 1, 0, root, True, ButtonPressMask, GrabModeAsync,
-            GrabModeAsync, None, None);
-    XGrabButton(dpy, 3, 0, root, True, ButtonPressMask, GrabModeAsync,
-            GrabModeAsync, None, None);
+	XGrabButton(dpy, 1, 0, root, True, ButtonPressMask, GrabModeAsync,
+			GrabModeAsync, None, None);
+	XGrabButton(dpy, 3, 0, root, True, ButtonPressMask, GrabModeAsync,
+			GrabModeAsync, None, None);
 
 
 	cursor = XCreateFontCursor(dpy, cursor_shape);
 	XDefineCursor(dpy, root, cursor);
-    XSync (dpy, root);			/* give xterm a chance */
-    if (XGrabPointer (dpy, root, False, (ButtonPressMask | PointerMotionMask | ButtonReleaseMask),
+	XSync (dpy, root);			/* give xterm a chance */
+	if (XGrabPointer (dpy, root, False, (ButtonPressMask | PointerMotionMask | ButtonReleaseMask),
 			GrabModeAsync, GrabModeAsync, None, cursor, CurrentTime) != GrabSuccess)
 		return die(dpy, 1);
 
-    for(;;)
-    {
+	for(;;)
+	{
 		if (! interruptibleXNextEvent(dpy, &ev))
 			continue;
 		switch(ev.type) {
-        	case ButtonPress:
+			case ButtonPress:
 				if (ev.xbutton.subwindow == None)
 					break;
 				if( XGrabPointer(dpy, ev.xbutton.subwindow, False,
@@ -108,5 +108,5 @@ int main()
 				return die(dpy, 0);
 				break;
 		}
-    }
+	}
 }
