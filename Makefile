@@ -1,6 +1,6 @@
 PREFIX = /usr/local/
 SRC = x-session.c 
-X11SRC = x-move-resize.c x-alt-tab.c 
+X11SRC = x-move-resize.c x-alt-tab.c x-focus-manager.c
 
 CC = gcc
 CFLAGS = -O2 -Wall
