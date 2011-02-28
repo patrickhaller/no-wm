@@ -1,3 +1,7 @@
+/* I lifted the move-resize code from tinywm and
+ * added an extra pointer grab to set the cursor
+ */
+
 /* TinyWM is written by Nick Welch <mack AT incise.org>, 2005.
  *
  * This software is in the public domain
@@ -43,52 +47,45 @@ static int interruptibleXNextEvent(Display *dpy, XEvent *event) {
 	}
 }
 
-int die(Display *dpy, int return_value) {
+int die(Display *dpy, Cursor *cursor, int return_value) {
 	XUngrabPointer(dpy, CurrentTime);
+	XFreeCursor (dpy, *cursor);
+	XSync (dpy, DefaultRootWindow(dpy));
 	XCloseDisplay(dpy);
 	return return_value;
 }
 
 int main()
 {
-    Display * dpy;
-    Window root;
-    XWindowAttributes attr;
-    XButtonEvent start;
-    XEvent ev;
+	Display * dpy;
+	Window root;
+	XWindowAttributes attr;
+	XButtonEvent start;
+	XEvent ev;
 	Cursor cursor;
-	int cursor_shape = XC_X_cursor;
+	int cursor_shape = XC_plus;
 	start.button = 0; start.x_root = 0; start.y_root = 0;
 
-    if(!(dpy = XOpenDisplay(0x0))) return 1;
+	if(!(dpy = XOpenDisplay(0x0))) return 1;
 
-    root = DefaultRootWindow(dpy);
-
-    XGrabButton(dpy, 1, 0, root, True, ButtonPressMask, GrabModeAsync,
-            GrabModeAsync, None, None);
-    XGrabButton(dpy, 3, 0, root, True, ButtonPressMask, GrabModeAsync,
-            GrabModeAsync, None, None);
-
-
+	root = DefaultRootWindow(dpy);
 	cursor = XCreateFontCursor(dpy, cursor_shape);
-	XDefineCursor(dpy, root, cursor);
-    XSync (dpy, root);			/* give xterm a chance */
-    if (XGrabPointer (dpy, root, False, (ButtonPressMask | PointerMotionMask | ButtonReleaseMask),
+	if (XGrabPointer (dpy, root, False, (ButtonPressMask),
 			GrabModeAsync, GrabModeAsync, None, cursor, CurrentTime) != GrabSuccess)
-		return die(dpy, 1);
+		return die(dpy, &cursor, 1);
 
-    for(;;)
-    {
+	for(;;) {
 		if (! interruptibleXNextEvent(dpy, &ev))
 			continue;
 		switch(ev.type) {
-        	case ButtonPress:
+			case ButtonPress:
 				if (ev.xbutton.subwindow == None)
 					break;
-				if( XGrabPointer(dpy, ev.xbutton.subwindow, False,
-						PointerMotionMask|ButtonReleaseMask, GrabModeAsync,
-						GrabModeAsync, None, cursor, CurrentTime) != GrabSuccess)
-					return die(dpy, 1);
+				XUngrabPointer(dpy, root);
+				XSync(dpy, root);
+				if (XGrabPointer (dpy, ev.xbutton.subwindow, False, (PointerMotionMask | ButtonReleaseMask),
+						GrabModeAsync, GrabModeAsync, None, cursor, CurrentTime) != GrabSuccess)
+					return die(dpy, &cursor, 1);
 				XGetWindowAttributes(dpy, ev.xbutton.subwindow, &attr);
 				start = ev.xbutton;
 				break;
@@ -105,8 +102,8 @@ int main()
 				}
 				break;
 			case ButtonRelease:
-				return die(dpy, 0);
+				return die(dpy, &cursor, 0);
 				break;
 		}
-    }
+	}
 }
