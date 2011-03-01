@@ -6,6 +6,7 @@ components
 		x-alt-tab
 		x-move-resize
 		x-session
+		x-focus-manager
 	distributed with X11 
 		xsel xprop xrdb xset xsetroot xwininfo
 	key-daemons
@@ -28,6 +29,7 @@ procedure
 		xset b off
 		exec xterm &
 		exec speckeysd ${HOME}/etc/speckeysd.conf &
+		exec x-focus-manager &
 		exec x-session
 	and your ${HOME}/etc/speckeysd.conf to be like
 		# Key names come from <X11/keysymdef.h> (remove the XK_ prefix).
