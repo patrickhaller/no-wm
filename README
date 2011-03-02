@@ -48,5 +48,9 @@ procedure
 		surf*geometry: 1024x600+0+0
 
 
-window managers bind orthogonals (keyboard shortcuts, window manipulation, window decoration) 
-which should remain separate. 
+window managers bind orthogonals (keyboard shortcuts, window manipulation,
+window decoration) which should remain separate. 
+
+x-focus-manager is not needed when all your apps return focus properly. A
+mis-behaving app can be fixed by calling x-alt-tab after it runs; however that
+needs to be scripted as focus remains with a window that no longer exists.
