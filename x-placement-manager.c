@@ -13,7 +13,8 @@
 void place_center(Display *d, XEvent *e);
 
 static void (*handler[LASTEvent]) (Display *d, XEvent *) = {
-	[MapRequest] = place_center
+	[MapRequest] = place_center,
+	[ConfigureNotify] = place_center
 };
 
 /// fun on down
