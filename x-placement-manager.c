@@ -27,9 +27,11 @@ place_center(Display *d, XEvent *e) {
 	XMapRequestEvent *ev = &e->xmaprequest;
 	int x, y;
 
-	if(!XGetWindowAttributes(d, r, &r_wa))
+	if (!XGetWindowAttributes(d, r, &r_wa))
 		return;
-	if(!XGetWindowAttributes(d, ev->window, &c_wa))
+	if (!XGetWindowAttributes(d, ev->window, &c_wa))
+		return;
+	if (c_wa.override_redirect)
 		return;
 	x = r_wa.width/2 - c_wa.width/2;
 	y = r_wa.height/2 - c_wa.height/2;
