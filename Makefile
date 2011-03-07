@@ -3,7 +3,7 @@ SRC = x-session.c
 X11SRC = x-move-resize.c x-alt-tab.c x-focus-manager.c x-placement-manager.c x-undecorate.c
 
 CC = gcc
-CFLAGS = -O2 -Wall
+CFLAGS = -O2 -Wall -std=c99 -pedantic
 X11LIB = -lX11 -L/usr/X11/lib
 
 BIN = ${SRC:.c=}

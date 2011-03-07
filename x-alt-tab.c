@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 		XCirculateSubwindowsDown(dpy, DefaultRootWindow(dpy));
 	else
 		XCirculateSubwindowsUp(dpy, DefaultRootWindow(dpy));
-	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime); // nuke focus back to pointer
+	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime); /* nuke focus back to pointer */
 	XSync(dpy, True);
 	return 0;
 }

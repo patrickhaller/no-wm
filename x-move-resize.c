@@ -42,7 +42,7 @@ static int interruptibleXNextEvent(Display *dpy, XEvent *event) {
 			if (errno == EINTR) {
 				return 0;
 			}
-			//	LOG_ERROR("interruptibleXNextEvent(): select()\n");
+			/*	LOG_ERROR("interruptibleXNextEvent(): select()\n"); */
 		}
 	}
 }
