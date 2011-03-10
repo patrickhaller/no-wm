@@ -14,55 +14,89 @@
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
-/* interruptibleXNextEvent() is taken from the Blender source and comes with
- * the following copyright notice: */
+Cursor cursor;
+XWindowAttributes attr;
+XButtonEvent start;
+extern void exit(int code);
 
-/* Copyright (c) Mark J. Kilgard, 1994, 1995, 1996. */
+// fun on down
 
-/* This program is freely distributable without licensing fees
- * and is provided without guarantee or warrantee expressed or
- * implied. This program is -not- in the public domain. */
+void
+configure(Display *d, Window *w, XWindowAttributes *wa) {
+	XConfigureEvent ce;
 
-/* Unlike XNextEvent, if a signal arrives, interruptibleXNextEvent will
- * return zero. */
-
-static int interruptibleXNextEvent(Display *dpy, XEvent *event) {
-	fd_set fds;
-	int rc;
-	int dpy_fd = ConnectionNumber(dpy);
-	for (;;) {
-		if (XPending(dpy)) {
-			XNextEvent(dpy, event);
-			return 1;
-		}
-		FD_ZERO(&fds);
-		FD_SET(dpy_fd, &fds);
-		rc = select(dpy_fd + 1, &fds, NULL, NULL, NULL);
-		if (rc < 0) {
-			if (errno == EINTR) {
-				return 0;
-			}
-			/*	LOG_ERROR("interruptibleXNextEvent(): select()\n"); */
-		}
-	}
+	ce.type = ConfigureNotify;
+	ce.display = d;
+	ce.event = *w;
+	ce.window = *w;
+	ce.x = wa->x;
+	ce.y = wa->y;
+	ce.width = wa->width;
+	ce.height = wa->height;
+	ce.border_width = 0;
+	ce.above = None;
+	ce.override_redirect = False;
+	XSendEvent(d, *w, False, StructureNotifyMask, (XEvent *)&ce);
 }
 
-int die(Display *dpy, Cursor *cursor, int return_value) {
+void die(Display *dpy, int return_value) {
 	XUngrabPointer(dpy, CurrentTime);
-	XFreeCursor (dpy, *cursor);
+	XFreeCursor (dpy, cursor);
 	XSync (dpy, DefaultRootWindow(dpy));
 	XCloseDisplay(dpy);
-	return return_value;
+	exit(return_value);
+}
+
+void
+buttonpress(Display *dpy, XEvent *e) {
+	XEvent ev = *e;
+	Window root = DefaultRootWindow(dpy);
+	if (ev.xbutton.subwindow == None)
+		return;
+	XUngrabPointer(dpy, root);
+	XSync(dpy, root);
+	if (XGrabPointer (dpy, ev.xbutton.subwindow, False, (PointerMotionMask | ButtonReleaseMask),
+			GrabModeAsync, GrabModeAsync, None, cursor, CurrentTime) != GrabSuccess)
+		die(dpy, 1);
+	XGetWindowAttributes(dpy, ev.xbutton.subwindow, &attr);
+	start = ev.xbutton;
+}
+
+void
+motionnotify(Display *dpy, XEvent *e) {
+	int xdiff, ydiff;
+	XEvent ev = *e;
+
+	while (XCheckTypedEvent(dpy, MotionNotify, &ev));
+	xdiff = ev.xbutton.x_root - start.x_root;
+	ydiff = ev.xbutton.y_root - start.y_root;
+	XMoveResizeWindow(dpy, ev.xmotion.window,
+		attr.x + (start.button==1 ? xdiff : 0),
+		attr.y + (start.button==1 ? ydiff : 0),
+		MAX(1, attr.width + (start.button==3 ? xdiff : 0)),
+		MAX(1, attr.height + (start.button==3 ? ydiff : 0)));
+	if (start.button == 1)
+		return;
+	// tell dumb clients they've changed sizes
+	attr.width += xdiff; attr.height += ydiff;
+	configure(dpy, &(ev.xmotion.window), &attr);
+}
+
+void
+buttonrelease(Display *dpy, XEvent *e) {
+	die(dpy, 0);
 }
 
 int main()
 {
 	Display * dpy;
 	Window root;
-	XWindowAttributes attr;
-	XButtonEvent start;
 	XEvent ev;
-	Cursor cursor;
+	void (*handler[LASTEvent]) (Display *d, XEvent *) = {
+		[ButtonPress] = buttonpress,
+		[ButtonRelease] = buttonrelease,
+		[MotionNotify] = motionnotify,
+	};
 	int cursor_shape = XC_plus;
 	start.button = 0; start.x_root = 0; start.y_root = 0;
 
@@ -72,38 +106,11 @@ int main()
 	cursor = XCreateFontCursor(dpy, cursor_shape);
 	if (XGrabPointer (dpy, root, False, (ButtonPressMask),
 			GrabModeAsync, GrabModeAsync, None, cursor, CurrentTime) != GrabSuccess)
-		return die(dpy, &cursor, 1);
+		die(dpy, 1);
 
 	for(;;) {
-		if (! interruptibleXNextEvent(dpy, &ev))
-			continue;
-		switch(ev.type) {
-			case ButtonPress:
-				if (ev.xbutton.subwindow == None)
-					break;
-				XUngrabPointer(dpy, root);
-				XSync(dpy, root);
-				if (XGrabPointer (dpy, ev.xbutton.subwindow, False, (PointerMotionMask | ButtonReleaseMask),
-						GrabModeAsync, GrabModeAsync, None, cursor, CurrentTime) != GrabSuccess)
-					return die(dpy, &cursor, 1);
-				XGetWindowAttributes(dpy, ev.xbutton.subwindow, &attr);
-				start = ev.xbutton;
-				break;
-			case MotionNotify: {
-				int xdiff, ydiff;
-				while (XCheckTypedEvent(dpy, MotionNotify, &ev));
-				xdiff = ev.xbutton.x_root - start.x_root;
-				ydiff = ev.xbutton.y_root - start.y_root;
-				XMoveResizeWindow(dpy, ev.xmotion.window,
-					attr.x + (start.button==1 ? xdiff : 0),
-					attr.y + (start.button==1 ? ydiff : 0),
-					MAX(1, attr.width + (start.button==3 ? xdiff : 0)),
-					MAX(1, attr.height + (start.button==3 ? ydiff : 0)));
-				}
-				break;
-			case ButtonRelease:
-				return die(dpy, &cursor, 0);
-				break;
-		}
+		XNextEvent(dpy, &ev);
+		if(handler[ev.type])
+			handler[ev.type](dpy, &ev);
 	}
 }
