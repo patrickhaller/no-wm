@@ -19,6 +19,7 @@ place_center(Display *d, XEvent *e) {
 	static XWindowAttributes r_wa;
 	static XWindowAttributes c_wa;
 	Window r = DefaultRootWindow(d);
+	Window trans = None;
 	XMapRequestEvent *ev = &e->xmaprequest;
 	int x, y;
 
@@ -28,13 +29,18 @@ place_center(Display *d, XEvent *e) {
 		return;
 	if (c_wa.override_redirect)
 		return;
+	if(XGetTransientForHint(d, ev->window, &trans))
+		return;
 	x = r_wa.width/2 - c_wa.width/2;
 	y = r_wa.height/2 - c_wa.height/2;
 	if (x < 0)
 		x = 0;
 	if (y < 0)
 		y = 0;
-	XMoveWindow(d, ev->window, x, y);
+	XMoveResizeWindow(d, ev->window, x, y,
+			c_wa.width > r_wa.width ? r_wa.width : c_wa.width,
+			c_wa.height > r_wa.height ? r_wa.height : c_wa.height
+			);
 }
 
 int
