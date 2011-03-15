@@ -1,17 +1,23 @@
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <stdio.h>
 
 // http://tronche.com/gui/x/xlib/
+// first window listed is top-most, last is bottom-most in window-stacking
 int main(void) {
 	Display *dpy;
-	Window w;
-	Window *root_return;
-	Window *parent_return;
-	Window **children_return;
-	unsigned int *nchildren_return;
+	Window root;
+	Window parent;
+	Window *wins;
+	XClassHint hint;
+	unsigned int nwins;
 
 	if(!(dpy = XOpenDisplay(NULL)))
 		return 1;
-	XQueryTree(display, DefaultRootWindow(dpy), root_return, parent_return, children_return, nchildren_return);
+	XQueryTree(dpy, DefaultRootWindow(dpy), &root, &parent, &wins, &nwins);
 
-	for (int i=0; i < nchildren_return; i++) {
-
+	for (int i=nwins-1; i >= 0; i--) {
+		XGetClassHint(dpy, wins[i], &hint);
+		fprintf(stderr, "0x%-10x %s\n", (unsigned int)wins[i], hint.res_name);
+	}
+}
