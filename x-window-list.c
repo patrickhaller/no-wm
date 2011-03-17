@@ -24,6 +24,6 @@ int main(void) {
 		XGetWMName(dpy, wins[i], &name);
 		XGetWindowAttributes(dpy, wins[i], &attr);
 		if (attr.map_state == IsViewable)
-			fprintf(stderr, "0x%-10x %s - %s\n", (unsigned int)wins[i], hint.res_name, name.value);
+			fprintf(stdout, "0x%-10x %s - %s\n", (unsigned int)wins[i], hint.res_name, name.value);
 	}
 }
