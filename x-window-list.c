@@ -9,7 +9,6 @@ int main(void) {
 	Window root;
 	Window parent;
 	Window *wins;
-	XClassHint hint;
 	unsigned int nwins;
 
 	if(!(dpy = XOpenDisplay(NULL)))
@@ -17,7 +16,14 @@ int main(void) {
 	XQueryTree(dpy, DefaultRootWindow(dpy), &root, &parent, &wins, &nwins);
 
 	for (int i=nwins-1; i >= 0; i--) {
+		XTextProperty name;
+		XClassHint hint;
+		XWindowAttributes attr;
+
 		XGetClassHint(dpy, wins[i], &hint);
-		fprintf(stderr, "0x%-10x %s\n", (unsigned int)wins[i], hint.res_name);
+		XGetWMName(dpy, wins[i], &name);
+		XGetWindowAttributes(dpy, wins[i], &attr);
+		if (attr.map_state == IsViewable)
+			fprintf(stderr, "0x%-10x %s - %s\n", (unsigned int)wins[i], hint.res_name, name.value);
 	}
 }
