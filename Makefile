@@ -1,4 +1,4 @@
-PREFIX = /usr/local/
+PREFIX = /usr/local
 SRC = x-session.c 
 X11SRC = x-move-resize.c x-alt-tab.c x-focus-manager.c x-placement-manager.c x-undecorate.c x-window-list.c
 
