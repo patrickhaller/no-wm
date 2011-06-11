@@ -28,12 +28,11 @@ reset_focus(Display *d, XEvent *e) {
 void set_atoms(Display *dpy) { // from scrotwm via euclid-wm
 	int root = DefaultRootWindow(dpy);
 	Atom wm_change_state = XInternAtom(dpy,"_NET_WM_STATE",False);
-	Atom wm_fullscreen = XInternAtom(dpy,"_NET_WM_STATE_FULLSCREEN",False);
 	Atom wm_supported = XInternAtom(dpy,"_NET_SUPPORTED",False);
 	Atom wm_check = XInternAtom(dpy,"_NET_SUPPORTING_WM_CHECK",False);
 	Atom wm_name = XInternAtom(dpy,"_NET_WM_NAME",False);
 	Atom utf8 = XInternAtom(dpy,"UTF8_STRING",False);
-	Atom supported[] = {wm_supported, wm_name, wm_change_state, wm_fullscreen};
+	Atom supported[] = {wm_supported, wm_name, wm_change_state};
 	XChangeProperty(dpy,root,wm_check,XA_WINDOW,32,PropModeReplace,(unsigned char *)&root,1);
 	XChangeProperty(dpy,root,wm_name,utf8,8,PropModeReplace,(unsigned char *) "LG3D",5);
 	XChangeProperty(dpy,root,wm_supported,XA_ATOM,32,PropModeReplace,(unsigned char *) supported,4);
