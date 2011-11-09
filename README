@@ -19,6 +19,8 @@ components
 		unclutter http://unclutter.sourceforge.net/
 		dmenu http://tools.suckless.org/dmenu/
 		autocutsel http://www.nongnu.org/autocutsel/ 
+	overview
+		http://www.sbin.org/doc/Xlib/index_contents.html
 
 procedure
 	set up your ${HOME}/.xinitrc to be something like
