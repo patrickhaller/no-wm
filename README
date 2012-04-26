@@ -12,6 +12,7 @@ components
 	key-daemons
 		xbindkeys http://www.nongnu.org/xbindkeys/xbindkeys.html
 		speckeysd http://www.jessies.org/~enh/software/x11/
+		xchainkeys http://code.google.com/p/xchainkeys/
 	window-manipulators
 		xdotool http://www.semicomplete.com/projects/xdotool/
 		window http://www.jessies.org/~enh/software/x11/
