@@ -77,9 +77,6 @@ motionnotify(Display *dpy, XEvent *e) {
 		MAX(1, attr.height + (start.button==3 ? ydiff : 0)));
 	if (start.button == 1)
 		return;
-	// tell dumb clients they've changed sizes
-	attr.width += xdiff; attr.height += ydiff;
-	configure(dpy, &(ev.xmotion.window), &attr);
 }
 
 void
