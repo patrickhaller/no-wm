@@ -30,6 +30,7 @@ int main(int argc, char **argv)
 		else
 			XCirculateSubwindowsUp(dpy, DefaultRootWindow(dpy));
 
+		XSync(dpy, True);
 		XQueryTree(dpy, DefaultRootWindow(dpy), &root, &parent, &wins, &nwins);
 		w = wins + nwins - 1;
 		XGetClassHint(dpy, *w, &hint);
@@ -38,6 +39,5 @@ int main(int argc, char **argv)
 	} while (attr.width <= 1);
 
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
-	XSync(dpy, True);
 	return 0;
 }
