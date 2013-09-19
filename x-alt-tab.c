@@ -9,18 +9,33 @@ received a copy of the CC0 Public Domain Dedication along with this software.
 If not, see http://creativecommons.org/publicdomain/zero/1.0/ */
 
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
 int main(int argc, char **argv)
 {
 	Display *dpy;
+	XWindowAttributes attr;
 
 	if ( (dpy = XOpenDisplay(NULL)) == NULL)
 		return 1;
 
-	if (argc > 1)
-		XCirculateSubwindowsDown(dpy, DefaultRootWindow(dpy));
-	else
-		XCirculateSubwindowsUp(dpy, DefaultRootWindow(dpy));
+	do {
+		Window root, parent, *wins, *w;
+		unsigned int nwins;
+		XTextProperty name;
+		XClassHint hint;
+
+		if (argc > 1)
+			XCirculateSubwindowsDown(dpy, DefaultRootWindow(dpy));
+		else
+			XCirculateSubwindowsUp(dpy, DefaultRootWindow(dpy));
+
+		XQueryTree(dpy, DefaultRootWindow(dpy), &root, &parent, &wins, &nwins);
+		w = wins + nwins - 1;
+		XGetClassHint(dpy, *w, &hint);
+		XGetWMName(dpy, *w, &name);
+		XGetWindowAttributes(dpy, *w, &attr);
+	} while (attr.width <= 1);
 
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
 	XSync(dpy, True);
