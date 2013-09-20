@@ -15,13 +15,13 @@ int main(int argc, char **argv)
 {
 	Display *dpy;
 	XWindowAttributes attr;
+	unsigned int nwins, count = 0;
 
 	if ( (dpy = XOpenDisplay(NULL)) == NULL)
 		return 1;
 
 	do {
 		Window root, parent, *wins, *w;
-		unsigned int nwins;
 		XTextProperty name;
 		XClassHint hint;
 
@@ -30,14 +30,15 @@ int main(int argc, char **argv)
 		else
 			XCirculateSubwindowsUp(dpy, DefaultRootWindow(dpy));
 
+		XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
 		XSync(dpy, True);
 		XQueryTree(dpy, DefaultRootWindow(dpy), &root, &parent, &wins, &nwins);
 		w = wins + nwins - 1;
 		XGetClassHint(dpy, *w, &hint);
 		XGetWMName(dpy, *w, &name);
 		XGetWindowAttributes(dpy, *w, &attr);
-	} while (attr.width <= 1);
+		count++;
+	} while (attr.width <= 1 && count <= nwins+1);
 
-	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
 	return 0;
 }
