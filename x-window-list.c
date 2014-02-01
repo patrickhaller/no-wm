@@ -12,13 +12,24 @@ If not, see http://creativecommons.org/publicdomain/zero/1.0/ */
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 // http://tronche.com/gui/x/xlib/
 // first window listed is top-most, last is bottom-most in window-stacking
-int main(void) {
+
+static int cmp(Window **a, Window **b) {
+	if ( **a > **b )
+		return 1;
+	return -1;
+}
+
+int main(int argc, char **argv) {
 	Display *dpy;
-	Window root, parent, *wins, *w;
-	unsigned int nwins;
+	Window root, parent, *wins, *w, *winlist[256];
+	unsigned int nwins, count = 0, dwin = 0;
+
+	if (argc > 1)
+		dwin = atoi(argv[1]);
 
 	if ((dpy = XOpenDisplay(NULL)) == NULL)
 		return 1;
@@ -26,14 +37,29 @@ int main(void) {
 	XQueryTree(dpy, DefaultRootWindow(dpy), &root, &parent, &wins, &nwins);
 
 	for (w = wins + nwins - 1; w >= wins; w--) {
+		XWindowAttributes attr;
+
+		XGetWindowAttributes(dpy, *w, &attr);
+		if (attr.map_state != IsViewable)
+			continue;
+
+		winlist[count] = w;
+		count++;
+	}
+	qsort(winlist, count, sizeof(Window *), (__compar_fn_t)cmp);
+
+	for (int i=0; i<count; i++) {
 		XTextProperty name;
 		XClassHint hint;
-		XWindowAttributes attr;
+		w = winlist[i];
 
 		XGetClassHint(dpy, *w, &hint);
 		XGetWMName(dpy, *w, &name);
-		XGetWindowAttributes(dpy, *w, &attr);
-		if (attr.map_state == IsViewable)
-			printf("0x%-10x %s - %s\n", (unsigned int)*w, hint.res_name, name.value);
+		printf("%02d 0x%-12x %s - %s\n", i, (unsigned int)*w, hint.res_name, name.value);
+		if (argc > 1 && i == dwin) {
+			XRaiseWindow(dpy, *w);
+			XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
+			XSync(dpy, DefaultRootWindow(dpy));
+		}
 	}
 }
