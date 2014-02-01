@@ -22,8 +22,6 @@ int main(int argc, char **argv)
 
 	do {
 		Window root, parent, *wins, *w;
-		XTextProperty name;
-		XClassHint hint;
 
 		if (argc > 1)
 			XCirculateSubwindowsDown(dpy, DefaultRootWindow(dpy));
@@ -34,11 +32,9 @@ int main(int argc, char **argv)
 		XSync(dpy, True);
 		XQueryTree(dpy, DefaultRootWindow(dpy), &root, &parent, &wins, &nwins);
 		w = wins + nwins - 1;
-		XGetClassHint(dpy, *w, &hint);
-		XGetWMName(dpy, *w, &name);
 		XGetWindowAttributes(dpy, *w, &attr);
 		count++;
-	} while (attr.width <= 1 && count <= nwins+1);
+	} while (attr.map_state != IsViewable && count <= nwins+1);
 
 	return 0;
 }
