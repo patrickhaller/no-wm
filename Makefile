@@ -1,7 +1,7 @@
 PREFIX = /usr/local
 SRC = x-session.c 
 X11SRC = x-move-resize.c x-alt-tab.c x-focus-manager.c x-placement-manager.c x-undecorate.c x-window-list.c
-SCRIPTS= scripts/x-banish scripts/x-root-clean
+SCRIPTS= scripts/x-banish scripts/x-root-clean scripts/x-launcher
 
 CC = gcc
 CFLAGS = -O2 -Wall -std=c99 -pedantic 
@@ -21,4 +21,4 @@ clean:
 	rm $(BIN) $(X11BIN) 
 
 install:
-	install -m 0755 $(BIN) $(X11BIN) ${PREFIX}/bin/.
+	install -m 0755 $(BIN) $(X11BIN) $(SCRIPTS) ${PREFIX}/bin/.
