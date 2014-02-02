@@ -12,5 +12,6 @@ run=$( echo run | $dmenu )
 [[ "$run" == "" ]] && exit 0
 
 $run 2>&1 > $tmp
-xmessage -file $tmp  2>/dev/null&
-xdotool search --sync --onlyvisible --maxdepth 1 xmessage mousemove --window %1 10 10
+#[[ $(cat $tmp) == "" ]] && exit 0
+#xmessage -file $tmp  2>/dev/null&
+#xdotool search --sync --onlyvisible --maxdepth 1 xmessage mousemove --window %1 10 10
