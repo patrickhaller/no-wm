@@ -4,7 +4,7 @@
 #
 pattern="$1"; shift
 
-x-window-list | awk -v parent="" -v pattern="$pattern - " '
+x-window-list | awk -v parent="" -v pattern="$pattern - " '{
 	if ( match($0, pattern)) { 
 		wid = $3;
 		if ( parent == "") {
@@ -12,4 +12,5 @@ x-window-list | awk -v parent="" -v pattern="$pattern - " '
 		} else { 
 			system(sprintf("xdotool windowreparent %s %s", wid, parent));
 		}
-	}'
+	}
+}'
