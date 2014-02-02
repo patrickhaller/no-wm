@@ -1,0 +1,41 @@
+#!/bin/bash
+dir="${HOME}/.wm-banished"
+programs_to_stop='(surf|acroread)'
+
+pid() {
+	action=$1
+	wid=$2
+	pid=$( xdotool getwindowpid $wid )
+	ps h -p $pid | grep -qsE "$programs_to_stop" || return 0
+	case $action in
+		stop) kill -STOP $pid;;
+		cont) kill -CONT $pid;;
+	esac
+}
+
+[[ ! -d $dir ]] && mkdir -p $dir
+
+[[ "$1" = "clean" ]] && {
+	for i in $dir/*; do
+		[[ -f "$i" ]] && rm "$i"
+	done
+	exit 0
+}
+
+[[ "$1" = "push" ]] && {
+	w_id=$( xdotool search --maxdepth 1 --onlyvisible . 2>/dev/null | tail -1 )
+	xdotool windowunmap $w_id
+	pid "stop" $w_id
+	echo "banished $(xdotool getwindowname $w_id)" | ~/bin/dmenu.sh
+	touch "${dir}/${w_id}"
+	exit 0 
+}
+
+w_id=$( ls -tr $dir | tail -1)
+[[ "$w_id" = "" ]] && { 
+	exit 0
+}
+pid "cont" $w_id
+xdotool windowmap $w_id windowraise
+xdotool windowraise  $w_id
+rm -f "${dir}/${w_id}"

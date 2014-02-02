@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# chromium will spew windows into root, which breaks x-alt-tab, so clean them up
+#
+pattern="$1"; shift
+
+x-window-list | awk -v parent="" -v pattern="$pattern - " '
+	if ( match($0, pattern)) { 
+		wid = $3;
+		if ( parent == "") {
+			parent = wid;
+		} else { 
+			system(sprintf("xdotool windowreparent %s %s", wid, parent));
+		}
+	}'
