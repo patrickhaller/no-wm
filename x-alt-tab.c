@@ -10,31 +10,34 @@ If not, see http://creativecommons.org/publicdomain/zero/1.0/ */
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <stdio.h>
 
 int main(int argc, char **argv)
 {
 	Display *dpy;
 	XWindowAttributes attr;
 	unsigned int nwins, count = 0;
+	Window root, parent, *wins, *w = 0;
 
 	if ( (dpy = XOpenDisplay(NULL)) == NULL)
 		return 1;
 
 	do {
-		Window root, parent, *wins, *w;
-
 		if (argc > 1)
 			XCirculateSubwindowsDown(dpy, DefaultRootWindow(dpy));
 		else
 			XCirculateSubwindowsUp(dpy, DefaultRootWindow(dpy));
 
-		XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
 		XSync(dpy, True);
 		XQueryTree(dpy, DefaultRootWindow(dpy), &root, &parent, &wins, &nwins);
 		w = wins + nwins - 1;
 		XGetWindowAttributes(dpy, *w, &attr);
 		count++;
+
 	} while (attr.map_state != IsViewable && count <= nwins+1);
+
+	XSetInputFocus(dpy, *w, RevertToParent, CurrentTime);
+	XSync(dpy, True);
 
 	return 0;
 }
