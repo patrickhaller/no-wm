@@ -20,5 +20,5 @@ $(X11BIN): %: %.c
 clean:
 	rm $(BIN) $(X11BIN) 
 
-install:
+install: $(X11BIN)
 	install -m 0755 $(BIN) $(X11BIN) $(SCRIPTS) ${PREFIX}/bin/.
