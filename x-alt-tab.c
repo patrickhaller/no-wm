@@ -22,20 +22,23 @@ int main(int argc, char **argv)
 		return 1;
 
 	do {
-		if (argc > 1)
-			XCirculateSubwindowsDown(dpy, DefaultRootWindow(dpy));
-		else
-			XCirculateSubwindowsUp(dpy, DefaultRootWindow(dpy));
-
 		XSync(dpy, True);
 		XQueryTree(dpy, DefaultRootWindow(dpy), &root, &parent, &wins, &nwins);
-		w = wins + nwins - 1;
+
+		if (argc > 1) {
+			w = wins + nwins - 1;
+			XLowerWindow(dpy, *w);
+		} else {
+			w = wins;
+			XRaiseWindow(dpy, *w);
+		}
+
 		XGetWindowAttributes(dpy, *w, &attr);
 		count++;
 
 	} while (attr.map_state != IsViewable && count <= nwins+1);
 
-	XSetInputFocus(dpy, *w, RevertToParent, CurrentTime);
+	XSetInputFocus(dpy, *w, RevertToPointerRoot, CurrentTime);
 	XSync(dpy, True);
 
 	return 0;
