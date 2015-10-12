@@ -14,8 +14,7 @@ If not, see http://creativecommons.org/publicdomain/zero/1.0/ */
 void alt_tab(int argc, Display *dpy, Window *wins, unsigned int nwins) {
 	XWindowAttributes attr;
 	Window *viewables[nwins], *w = 0;
-	unsigned int count = 0;
-	int vc = 0;
+	unsigned int count, vc = 0;
 
 	// make list of viewable windows
 	for (count = 0; count < nwins; count++) {
