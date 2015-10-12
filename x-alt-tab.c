@@ -11,35 +11,50 @@ If not, see http://creativecommons.org/publicdomain/zero/1.0/ */
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
+void alt_tab(int argc, Display *dpy, Window *wins, unsigned int nwins) {
+	XWindowAttributes attr;
+	Window *viewables[nwins], *w = 0;
+	unsigned int count = 0;
+	int vc = 0;
+
+	// make list of viewable windows
+	for (count = 0; count < nwins; count++) {
+		w = wins + count;
+		XGetWindowAttributes(dpy, *w, &attr);
+		if (attr.map_state == IsViewable) {
+			viewables[vc] = w;
+			vc++;
+		}
+	}
+	viewables[vc] = NULL;
+
+	// promote the last to top, or demote top to last and raise 2nd
+	if (argc > 1) {
+		w = viewables[vc - 2];
+		XLowerWindow(dpy, *(viewables[vc - 1]));
+	} else {
+		w = viewables[0];
+	}
+
+	XRaiseWindow(dpy, *w);
+	XSetInputFocus(dpy, *w, RevertToPointerRoot, CurrentTime);
+	XSync(dpy, True);
+}
+
 int main(int argc, char **argv)
 {
 	Display *dpy;
-	XWindowAttributes attr;
-	unsigned int nwins, count = 0;
-	Window root, parent, *wins, *w = 0;
+	unsigned int nwins = 0;
+	Window root, parent, *wins = 0;
 
 	if ( (dpy = XOpenDisplay(NULL)) == NULL)
 		return 1;
 
-	do {
-		XSync(dpy, True);
-		XQueryTree(dpy, DefaultRootWindow(dpy), &root, &parent, &wins, &nwins);
-
-		if (argc > 1) {
-			w = wins + nwins - 1;
-			XLowerWindow(dpy, *w);
-		} else {
-			w = wins;
-			XRaiseWindow(dpy, *w);
-		}
-
-		XGetWindowAttributes(dpy, *w, &attr);
-		count++;
-
-	} while (attr.map_state != IsViewable && count <= nwins+1);
-
-	XSetInputFocus(dpy, *w, RevertToPointerRoot, CurrentTime);
 	XSync(dpy, True);
+	XQueryTree(dpy, DefaultRootWindow(dpy), &root, &parent, &wins, &nwins);
+	if (nwins == 1)
+		return 0;
 
+	alt_tab(argc, dpy, wins, nwins);
 	return 0;
 }
