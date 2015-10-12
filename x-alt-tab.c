@@ -10,7 +10,6 @@ If not, see http://creativecommons.org/publicdomain/zero/1.0/ */
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <stdio.h>
 
 void alt_tab(int argc, Display *dpy, Window *wins, unsigned int nwins) {
 	XWindowAttributes attr;
