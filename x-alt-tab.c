@@ -11,7 +11,7 @@ If not, see http://creativecommons.org/publicdomain/zero/1.0/ */
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-void alt_tab(unsigned int direction, Display *dpy, Window *wins, unsigned int nwins) {
+void x_alt_tab(unsigned int direction, Display *dpy, Window *wins, unsigned int nwins) {
 	XWindowAttributes attr;
 	Window *viewables[nwins], *w = 0;
 	unsigned int vc = 0;
@@ -53,6 +53,6 @@ int main(int argc, char **argv)
 		return 0;
 
 	direction = argc % 2;
-	alt_tab(direction, dpy, wins, nwins);
+	x_alt_tab(direction, dpy, wins, nwins);
 	return 0;
 }
