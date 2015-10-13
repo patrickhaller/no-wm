@@ -11,28 +11,26 @@ If not, see http://creativecommons.org/publicdomain/zero/1.0/ */
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-void alt_tab(int argc, Display *dpy, Window *wins, unsigned int nwins) {
+void alt_tab(unsigned int direction, Display *dpy, Window *wins, unsigned int nwins) {
 	XWindowAttributes attr;
 	Window *viewables[nwins], *w = 0;
-	unsigned int count, vc = 0;
+	unsigned int vc = 0;
 
 	// make list of viewable windows
-	for (count = 0; count < nwins; count++) {
-		w = wins + count;
+	for (w = wins; w - wins < nwins; w++) {
 		XGetWindowAttributes(dpy, *w, &attr);
 		if (attr.map_state == IsViewable) {
-			viewables[vc] = w;
-			vc++;
+			viewables[vc++] = w;
 		}
 	}
 	viewables[vc] = NULL;
 
-	// promote the last to top, or demote top to last and raise 2nd
-	if (argc > 1) {
-		w = viewables[vc - 2];
-		XLowerWindow(dpy, *(viewables[vc - 1]));
-	} else {
+	// promote the bottom to top, or demote top to bottom and raise 2nd
+	if (direction) {
 		w = viewables[0];
+	} else {
+		XLowerWindow(dpy, *(viewables[vc - 1]));
+		w = viewables[vc - 2];
 	}
 
 	XRaiseWindow(dpy, *w);
@@ -43,7 +41,7 @@ void alt_tab(int argc, Display *dpy, Window *wins, unsigned int nwins) {
 int main(int argc, char **argv)
 {
 	Display *dpy;
-	unsigned int nwins = 0;
+	unsigned int nwins, direction = 0;
 	Window root, parent, *wins = 0;
 
 	if ( (dpy = XOpenDisplay(NULL)) == NULL)
@@ -54,6 +52,7 @@ int main(int argc, char **argv)
 	if (nwins == 1)
 		return 0;
 
-	alt_tab(argc, dpy, wins, nwins);
+	direction = argc % 2;
+	alt_tab(direction, dpy, wins, nwins);
 	return 0;
 }
