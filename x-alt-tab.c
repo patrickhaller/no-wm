@@ -11,7 +11,10 @@ If not, see http://creativecommons.org/publicdomain/zero/1.0/ */
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-void x_alt_tab(unsigned int direction, Display *dpy, Window *wins, unsigned int nwins) {
+// Which way do we want to rotate the window stack?
+typedef enum RotationEnum { bottom_to_top = 1, top_to_bottom = 0 } Rotation;
+
+void x_alt_tab(Rotation r, Display *dpy, Window *wins, unsigned int nwins) {
 	XWindowAttributes attr;
 	Window *viewables[nwins], *w = 0;
 	unsigned int vc = 0;
@@ -26,7 +29,7 @@ void x_alt_tab(unsigned int direction, Display *dpy, Window *wins, unsigned int 
 	viewables[vc] = NULL;
 
 	// promote the bottom to top, or demote top to bottom and raise 2nd
-	if (direction) {
+	if (r == bottom_to_top) {
 		w = viewables[0];
 	} else {
 		XLowerWindow(dpy, *(viewables[vc - 1]));
@@ -38,21 +41,21 @@ void x_alt_tab(unsigned int direction, Display *dpy, Window *wins, unsigned int 
 	XSync(dpy, True);
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
 	Display *dpy;
-	unsigned int nwins, direction = 0;
+	unsigned int nwins = 0;
 	Window root, parent, *wins = 0;
+	Rotation r;
 
 	if ( (dpy = XOpenDisplay(NULL)) == NULL)
 		return 1;
 
 	XSync(dpy, True);
 	XQueryTree(dpy, DefaultRootWindow(dpy), &root, &parent, &wins, &nwins);
-	if (nwins == 1)
+	if (nwins <= 1)
 		return 0;
 
-	direction = argc % 2;
-	x_alt_tab(direction, dpy, wins, nwins);
+	r = argc % 2 ? top_to_bottom : bottom_to_top;
+	x_alt_tab(r, dpy, wins, nwins);
 	return 0;
 }
