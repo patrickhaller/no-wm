@@ -12,7 +12,7 @@ If not, see http://creativecommons.org/publicdomain/zero/1.0/ */
 #include <X11/Xutil.h>
 
 // Which way do we want to rotate the window stack?
-typedef enum RotationEnum { bottom_to_top = 0, top_to_bottom = 1 } Rotation;
+typedef enum RotationEnum { bottom_to_top, top_to_bottom } Rotation;
 
 void x_alt_tab(Rotation r, Display *dpy, Window *wins, unsigned int nwins) {
 	XWindowAttributes attr;
@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
 	if (nwins <= 1)
 		return 0;
 
-	r = argc % 2 ? top_to_bottom : bottom_to_top;
+	r = (argc == 1) ? bottom_to_top : top_to_bottom;
 	x_alt_tab(r, dpy, wins, nwins);
 	return 0;
 }
