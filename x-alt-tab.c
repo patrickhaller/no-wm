@@ -15,11 +15,11 @@ If not, see http://creativecommons.org/publicdomain/zero/1.0/ */
 typedef enum RotationEnum { bottom_to_top, top_to_bottom } Rotation;
 
 void x_alt_tab(Rotation r, Display *dpy, Window *wins, unsigned int nwins) {
-	XWindowAttributes attr;
 	Window *viewables[nwins], *w = 0;
 	unsigned int vc = 0;
 
 	// make list of viewable windows
+	XWindowAttributes attr;
 	for (w = wins; w - wins < nwins; w++) {
 		XGetWindowAttributes(dpy, *w, &attr);
 		if (attr.map_state == IsViewable) {
@@ -45,7 +45,6 @@ int main(int argc, char **argv) {
 	Display *dpy;
 	unsigned int nwins = 0;
 	Window root, parent, *wins = 0;
-	Rotation r;
 
 	if ( (dpy = XOpenDisplay(NULL)) == NULL)
 		return 1;
@@ -55,7 +54,7 @@ int main(int argc, char **argv) {
 	if (nwins <= 1)
 		return 0;
 
-	r = (argc == 1) ? bottom_to_top : top_to_bottom;
+	Rotation r = (argc == 1) ? bottom_to_top : top_to_bottom;
 	x_alt_tab(r, dpy, wins, nwins);
 	return 0;
 }
