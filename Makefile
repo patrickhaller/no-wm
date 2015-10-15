@@ -1,7 +1,7 @@
 PREFIX = /usr/local
 SRC = x-session.c 
-X11SRC = x-move-resize.c x-alt-tab.c x-focus-manager.c x-placement-manager.c x-undecorate.c x-window-list.c
-SCRIPTS= scripts/x-banish scripts/x-root-clean scripts/x-launcher
+X11SRC = $(filter-out $(SRC),$(wildcard *.c))
+SCRIPTS= $(wildcard scripts/*)
 
 CC = gcc
 CFLAGS = -O2 -Wall -std=c99 -pedantic 
@@ -17,8 +17,11 @@ $(BIN): %: %.c
 $(X11BIN): %: %.c
 	$(CC) $(CFLAGS) $(X11LIB) $^ -o $@
 
-clean:
-	rm $(BIN) $(X11BIN) 
+clean: dist
+	@rm $(basename $(wildcard *.c)) $(wildcard *.c.orig)
+
+dist:
+	@astyle --style=google *.c
 
 install: $(X11BIN)
 	install -m 0755 $(BIN) $(X11BIN) $(SCRIPTS) ${PREFIX}/bin/.
