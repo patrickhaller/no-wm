@@ -27,7 +27,7 @@ If not, see http://creativecommons.org/publicdomain/zero/1.0/ */
 
 Cursor cursor;
 XWindowAttributes attr;
-XButtonEvent start;
+XButtonEvent start = { .button = 0, .x_root = 0, .y_root = 0 };
 extern void exit(int code);
 
 // fun on down
@@ -100,17 +100,14 @@ int main() {
         [ButtonRelease] = buttonrelease,
         [MotionNotify] = motionnotify,
     };
-    int cursor_shape = XC_plus;
-    start.button = 0;
-    start.x_root = 0;
-    start.y_root = 0;
 
     if(!(dpy = XOpenDisplay(0x0))) return 1;
 
     root = DefaultRootWindow(dpy);
-    cursor = XCreateFontCursor(dpy, cursor_shape);
     if (XGrabPointer (dpy, root, False, (ButtonPressMask),
-                      GrabModeAsync, GrabModeAsync, None, cursor, CurrentTime) != GrabSuccess)
+                      GrabModeAsync, GrabModeAsync, None,
+                      XCreateFontCursor(dpy, XC_plus),
+                      CurrentTime) != GrabSuccess)
         die(dpy, 1);
 
     for(;;) {
