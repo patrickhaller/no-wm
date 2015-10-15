@@ -22,16 +22,15 @@ void x_alt_tab(Rotation r, Display *dpy, Window *wins, unsigned int nwins) {
 	XWindowAttributes attr;
 	for (w = wins; w - wins < nwins; w++) {
 		XGetWindowAttributes(dpy, *w, &attr);
-		if (attr.map_state == IsViewable) {
+		if (attr.map_state == IsViewable)
 			viewables[vc++] = w;
-		}
 	}
 	viewables[vc] = NULL;
 
 	// promote the bottom to top, or demote top to bottom and raise 2nd
-	if (r == bottom_to_top) {
+	if (r == bottom_to_top)
 		w = viewables[0];
-	} else {
+	else {
 		XLowerWindow(dpy, *(viewables[vc - 1]));
 		w = viewables[vc - 2];
 	}
