@@ -12,5 +12,10 @@ If not, see http://creativecommons.org/publicdomain/zero/1.0/ */
 #include <unistd.h>
 #include <sys/wait.h>
 
-int main(void) { for (;;) { wait(NULL); sleep(1); } }
+int main(void) {
+    for (;;) {
+        wait(NULL);
+        sleep(1);
+    }
+}
 
