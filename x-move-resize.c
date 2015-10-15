@@ -32,8 +32,7 @@ extern void exit(int code);
 
 // fun on down
 
-void
-configure(Display *d, Window *w, XWindowAttributes *wa) {
+void configure(Display *d, Window *w, XWindowAttributes *wa) {
 	XConfigureEvent ce;
 
 	ce.type = ConfigureNotify;
@@ -58,8 +57,7 @@ void die(Display *dpy, int return_value) {
 	exit(return_value);
 }
 
-void
-buttonpress(Display *dpy, XEvent *e) {
+void buttonpress(Display *dpy, XEvent *e) {
 	XEvent ev = *e;
 	Window root = DefaultRootWindow(dpy);
 	if (ev.xbutton.subwindow == None)
@@ -73,8 +71,7 @@ buttonpress(Display *dpy, XEvent *e) {
 	start = ev.xbutton;
 }
 
-void
-motionnotify(Display *dpy, XEvent *e) {
+void motionnotify(Display *dpy, XEvent *e) {
 	int xdiff, ydiff;
 	XEvent ev = *e;
 
@@ -90,13 +87,11 @@ motionnotify(Display *dpy, XEvent *e) {
 		return;
 }
 
-void
-buttonrelease(Display *dpy, XEvent *e) {
+void buttonrelease(Display *dpy, XEvent *e) {
 	die(dpy, 0);
 }
 
-int main()
-{
+int main() {
 	Display * dpy;
 	Window root;
 	XEvent ev;
