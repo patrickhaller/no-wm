@@ -47,9 +47,9 @@ void x_window_list(Config cfg, Display *dpy, Window *wins, unsigned int nwins) {
         XClassHint hint;
         w = viewables[i];
 
-        XGetClassHint(dpy, *w, &hint);
-        XGetWMName(dpy, *w, &name);
-        printf("%02d 0x%-12x %s - %s\n", i, (unsigned int)*w, hint.res_name, name.value);
+        char * res_name = XGetClassHint(dpy, *w, &hint) ? hint.res_name : "<>";
+        char * wm_name  = XGetWMName(dpy, *w, &name)    ? name.value    : "<>";
+        printf("%02d 0x%-12x %s - %s\n", i, (unsigned int)*w, res_name, wm_name);
         if (cfg.is_switch && i == cfg.dst) {
             XRaiseWindow(dpy, *w);
             XSetInputFocus(dpy, *w, RevertToPointerRoot, CurrentTime);
