@@ -16,44 +16,30 @@ If not, see http://creativecommons.org/publicdomain/zero/1.0/ */
 #include <stdlib.h>
 
 typedef struct Config {
-    _Bool is_switch; // list windows or switch to dst window?
-    unsigned int dst;
+    _Bool needs_all; // list hidden windows too?
 } Config;
 
-/* static int cmp(Window **a, Window **b) {
-	if ( **a > **b )
-		return 1;
-	return -1;
-} */
-
 void x_window_list(Config cfg, Display *dpy, Window *wins, unsigned int nwins) {
-    Window *viewables[nwins], *w;
-    unsigned int vc = 0;
+    Window *w;
 
-    // get list of viewable windows
     for (w = wins + nwins - 1; w >= wins; w--) {
         XWindowAttributes attr;
-
-        XGetWindowAttributes(dpy, *w, &attr);
-        if (attr.map_state == IsViewable) {
-            viewables[vc++] = w;
-        }
-    }
-    viewables[vc] = NULL;
-
-    // list them out
-    for (int i=0; i < vc; i++) {
         XTextProperty name;
         XClassHint hint;
-        w = viewables[i];
+
+        if (!XGetWindowAttributes(dpy, *w, &attr))
+            continue;
+        if (attr.override_redirect)
+            continue;
+        if (attr.map_state == IsUnviewable)
+            continue;
+        if (attr.map_state == IsUnmapped && !cfg.needs_all)
+            continue;
 
         XGetClassHint(dpy, *w, &hint);
         XGetWMName(dpy, *w, &name);
-        printf("%02d 0x%-12x %s - %s\n", i, (unsigned int)*w, hint.res_name, name.value);
-        if (cfg.is_switch && i == cfg.dst) {
-            XRaiseWindow(dpy, *w);
-            XSetInputFocus(dpy, *w, RevertToPointerRoot, CurrentTime);
-        }
+
+        printf("0x%-12x %s - %s\n",(unsigned int)*w, hint.res_name, name.value);
     }
 }
 
@@ -61,11 +47,10 @@ int main(int argc, char **argv) {
     Display *dpy;
     Window root, parent, *wins;
     unsigned int nwins = 0;
-    Config c = { .is_switch = 0, .dst = 0 };
+    Config c = { .needs_all = 0};
 
     if (argc > 1) {
-        c.is_switch = 1;
-        c.dst = atoi(argv[1]);
+        c.needs_all = 1;
     }
 
     if ((dpy = XOpenDisplay(NULL)) == NULL)
