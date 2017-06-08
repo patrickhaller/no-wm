@@ -1,6 +1,6 @@
 #!/bin/bash
 dir="${HOME}/.wm-banished"
-programs_to_stop='(surf|acroread)'
+programs_to_stop='(surf|acroread|firefox)'
 
 pid() {
 	action=$1
@@ -26,7 +26,7 @@ pid() {
 	w_id=$( xdotool search --maxdepth 1 --onlyvisible . 2>/dev/null | tail -1 )
 	xdotool windowunmap $w_id
 	pid "stop" $w_id
-	echo "banished $(xdotool getwindowname $w_id)" | ~/bin/dmenu.sh
+	#echo "banished $(xdotool getwindowname $w_id)" | dmenu #~/bin/dmenu.sh
 	touch "${dir}/${w_id}"
 	exit 0 
 }

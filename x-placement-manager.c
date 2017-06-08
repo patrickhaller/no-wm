@@ -64,7 +64,7 @@ main(int argc, char **argv) {
 
     wa.cursor = XCreateFontCursor(dpy, XC_left_ptr);
     wa.event_mask = SubstructureNotifyMask|StructureNotifyMask;
-    XChangeWindowAttributes(dpy, DefaultRootWindow(dpy) , CWEventMask|CWCursor, &wa);
+    XChangeWindowAttributes(dpy, DefaultRootWindow(dpy), CWEventMask|CWCursor, &wa);
 
     for(;;) {
         XNextEvent(dpy, &e);

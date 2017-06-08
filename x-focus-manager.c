@@ -32,7 +32,7 @@ static void (*handler[LASTEvent]) (Display *d, XEvent *) = {
 
 void
 reset_focus(Display *d, XEvent *e) {
-    XSetInputFocus(d, PointerRoot , RevertToPointerRoot, CurrentTime);
+    XSetInputFocus(d, PointerRoot, RevertToPointerRoot, CurrentTime);
 }
 
 void set_atoms(Display *dpy) { // from scrotwm via euclid-wm
@@ -60,7 +60,7 @@ main(int argc, char **argv) {
 
     wa.cursor = XCreateFontCursor(dpy, XC_left_ptr);
     wa.event_mask = SubstructureNotifyMask|StructureNotifyMask;
-    XChangeWindowAttributes(dpy, DefaultRootWindow(dpy) , CWEventMask|CWCursor, &wa);
+    XChangeWindowAttributes(dpy, DefaultRootWindow(dpy), CWEventMask|CWCursor, &wa);
     set_atoms(dpy);
 
     for(;;) {
