@@ -27,7 +27,9 @@ void x_window_list(Config cfg, Display *dpy, Window *wins, unsigned int nwins) {
         XTextProperty name;
         XClassHint hint;
 
-        if (!XGetWindowAttributes(dpy, *w, &attr))
+        if (! XGetWMHints(dpy, *w))
+            continue;
+        if (! XGetWindowAttributes(dpy, *w, &attr))
             continue;
         if (attr.override_redirect)
             continue;
@@ -38,8 +40,11 @@ void x_window_list(Config cfg, Display *dpy, Window *wins, unsigned int nwins) {
 
         XGetClassHint(dpy, *w, &hint);
         XGetWMName(dpy, *w, &name);
-
-        printf("0x%-12x %s - %s\n",(unsigned int)*w, hint.res_name, name.value);
+        printf("0x%-12x %s   %s - %s\n",
+               (unsigned int)*w,
+               attr.map_state == IsUnmapped ? "U":"M",
+               hint.res_name, name.value
+              );
     }
 }
 
