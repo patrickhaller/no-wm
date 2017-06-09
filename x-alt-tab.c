@@ -19,11 +19,18 @@ void x_alt_tab(Rotation r, Display *dpy, Window *wins, unsigned int nwins) {
     unsigned int vc = 0;
 
     // make list of viewable windows
-    XWindowAttributes attr;
     for (w = wins; w - wins < nwins; w++) {
-        XGetWindowAttributes(dpy, *w, &attr);
-        if (attr.map_state == IsViewable)
-            viewables[vc++] = w;
+        XWindowAttributes attr;
+
+        if (! XGetWMHints(dpy, *w))
+            continue;
+        if (! XGetWindowAttributes(dpy, *w, &attr))
+            continue;
+        if (attr.override_redirect)
+            continue;
+        if (attr.map_state != IsViewable)
+            continue;
+        viewables[vc++] = w;
     }
     viewables[vc] = NULL;
 
