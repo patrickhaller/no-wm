@@ -2,8 +2,8 @@
 programs_to_stop='(surf|acroread|firefox)'
 
 pid() {
-	action=$1
-	wid=$2
+	action=$1; shift
+	wid=$1; shift
 	pid=$( xdotool getwindowpid $wid )
 	ps h -p $pid | grep -qsE "$programs_to_stop" || return 0
 	case $action in
@@ -13,28 +13,26 @@ pid() {
 }
 
 [[ "$1" = "push" ]] && {
-	w_id=$( xdotool search --maxdepth 1 --onlyvisible . 2>/dev/null | tail -1 )
+	w_id=$( xdotool getwindowfocus )
 	xdotool windowunmap $w_id
 	pid "stop" $w_id
-	#echo "banished $(xdotool getwindowname $w_id)" | dmenu #~/bin/dmenu.sh
 	exit 0 
 }
 
-wids=$( x-window-list all | awk '$2 == "U" { print $1 }' )
-cnt=$( echo "$wids" | wc -w )
+wids() { x-window-list all | awk '$2 == "U" { print $0 }'; }
+cnt=$( wids | wc -l )
 case "$cnt" in
 	0)
-		echo "nothing banished?!?, exiting..."
+		echo "nothing banished?!?, exiting..." | dmenu
 		exit 0;;
 	1) 
-		w_id="$wids"
-		break;;
+		w_id=$( wids | awk '{ print $1 }' );;
 	*)
 		[[ "$cnt" -gt 5 ]] && cnt=5
-		w_id=$(echo $wids | dmenu -l $cnt );;
+		w_id=$( wids | dmenu -l $cnt | awk '{print $1}' );;
 esac
 
-
 pid "cont" $w_id
-xdotool windowmap $w_id windowraise
-xdotool windowraise  $w_id
+xdotool windowmap $w_id
+xdotool windowraise $w_id
+xdotool windowfocus $w_id
