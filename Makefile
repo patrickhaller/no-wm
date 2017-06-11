@@ -1,10 +1,10 @@
 PREFIX = /usr/local
-SRC = x-session.c 
+SRC = x-session.c
 X11SRC = $(filter-out $(SRC),$(wildcard *.c))
 SCRIPTS= $(wildcard scripts/*)
 
 CC = gcc
-CFLAGS = -O2 -Wall -std=c99 -pedantic 
+CFLAGS = -O2 -Wall -std=c99 -pedantic
 X11LIB = -lX11 -L/usr/X11/lib
 
 BIN = ${SRC:.c=}
@@ -23,5 +23,5 @@ clean: dist
 dist:
 	@astyle --style=google *.c
 
-install:
+install: all
 	install -m 0755 $(BIN) $(X11BIN) $(SCRIPTS) ${PREFIX}/bin/.
