@@ -13,6 +13,7 @@ components
 		xbindkeys http://www.nongnu.org/xbindkeys/xbindkeys.html
 		speckeysd http://www.jessies.org/~enh/software/x11/
 		xchainkeys http://code.google.com/p/xchainkeys/
+		sxhkd https://github.com/baskerville/sxhkd
 	window-manipulators
 		xdotool http://www.semicomplete.com/projects/xdotool/
 		window http://www.jessies.org/~enh/software/x11/
@@ -39,15 +40,12 @@ procedure
 		# MUST have a Tab separating the key-combo and command
 		Alt-Tab	x-alt-tab
 		Alt-Shift-Tab	x-alt-tab -1
-		Alt-BackSpace	x-alt-tab -1
+		Alt-Return	x-banish push
+		Alt-BackSpace	x-banish pop
 		Alt-m	x-move-resize
-		Alt-0	x-window-list 0
-		Alt-1	x-window-list 1
-		Alt-2	x-window-list 2
-		Alt-3	x-window-list 3
 		Alt-r	echo run | dmenu -fn 10x20 | exec bash -s
 		Alt-s	surf "$( echo www.duckduckgo.com | dmenu )"
-		Alt-t	urxvt || rxvt || xterm
+		Alt-t	urxvt & x-focus-topmost wait
 		Alt-f	xdotool selectwindow windowsize 100% 100% windowmove 0 0
 
 	then ${HOME}/etc/Xresources with the preferred window geometries
