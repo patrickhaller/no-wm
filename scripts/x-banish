@@ -16,6 +16,7 @@ pid() {
 	w_id=$( xdotool getwindowfocus )
 	xdotool windowunmap $w_id
 	pid "stop" $w_id
+	xdotool windowfocus $( x-window-list | awk '{print $1; exit }' )
 	exit 0 
 }
 
