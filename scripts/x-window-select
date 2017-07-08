@@ -1,0 +1,17 @@
+#!/bin/bash
+
+wids() { x-window-list | sed 1d | awk '$2 == "M" { print $0 }'; }
+cnt=$( wids | wc -l )
+case "$cnt" in
+	0)
+		echo "no windows?!?, exiting..." | dmenu
+		exit 0;;
+	1) 
+		w_id=$( wids | awk '{ print $1 }' );;
+	*)
+		[[ "$cnt" -gt 5 ]] && cnt=5
+		w_id=$( wids | dmenu -l $cnt | awk '{print $1}' );;
+esac
+
+xdotool windowraise $w_id
+xdotool windowfocus $w_id
