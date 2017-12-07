@@ -14,6 +14,7 @@ components
 		speckeysd http://www.jessies.org/~enh/software/x11/
 		xchainkeys http://code.google.com/p/xchainkeys/
 		sxhkd https://github.com/baskerville/sxhkd
+		alttab https://github.com/sagb/alttab
 	window-manipulators
 		xdotool http://www.semicomplete.com/projects/xdotool/
 		window http://www.jessies.org/~enh/software/x11/
